@@ -2,7 +2,7 @@ const {mongoose, Schema, model } = require("mongoose");
 
 const serviceModel = new Schema(
     {
-        pictures:{
+        picture:{
             type: String,
         },
         prestation:{
@@ -21,7 +21,7 @@ const serviceModel = new Schema(
             type: String,
             required: true,
         },
-        AmountOfPeople:{
+        amountOfPeople:{
             type:Number,
             required: true,
             min: 1,
@@ -45,4 +45,4 @@ const serviceModel = new Schema(
     }
 )
 
-module.export = model("Service", serviceModel)
+module.exports = model("Service", serviceModel)
