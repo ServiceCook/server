@@ -2,20 +2,24 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const Reservation = require("../models/Reservation.model");
 const Service = require("../models/Service.model");
+const User = require("../models/User.model")
+const { isAuthenticated } = require("../middleware/jwt.middleware")
 
-router.post("/services", (req, res, next) => {
-  const {picture, prestation, place, price, description, amountOfPeople, priceByPerson, date } = req.body;
+router.post("/services", isAuthenticated, (req, res, next) => {
+  const {picture, speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
+
+  console.log("give me something about this", req.payload )
 
   const newService = {
     picture: picture,
-    prestation: prestation,
+    speciality: speciality,
     place: place,
-    price: price,
     description: description,
     amountOfPeople: amountOfPeople,
-    priceByPerson: priceByPerson,
+    pricePerPerson: pricePerPerson,
+    totalPrice: totalPrice,
     date: date,
-    // user: []
+    owner: req.payload._id
   }
 
   Service.create(newService)
@@ -31,7 +35,7 @@ router.post("/services", (req, res, next) => {
 
 router.get('/services', (req, res, next) => {
   Service.find()
-    //   .populate("User")
+      .populate({path: "owner", select: "-password"})
       .then(response => {
           res.json(response)
       })
@@ -78,7 +82,7 @@ router.put('/services/:serviceId', (req, res, next) => {
         price: req.body.price,
         description: req.body.description,
         amountOfPeople: req.body.amountOfPeople,
-        priceByPerson: req.body.priceByPerson,
+        pricePerPerson: req.body.pricePerPerson,
         date: req.body.date,
         // user: []
       }

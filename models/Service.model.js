@@ -1,20 +1,17 @@
-const {mongoose, Schema, model } = require("mongoose");
+const mongoose = require('mongoose');
+const { Schema, model } = require("mongoose");
 
 const serviceModel = new Schema(
     {
         picture:{
             type: String,
         },
-        prestation:{
+        speciality:{
             type: String,
             required: true,
         },
         place:{
             type: String,
-            required: true,
-        },
-        price:{
-            type: Number,
             required: true,
         },
         description: {
@@ -26,19 +23,22 @@ const serviceModel = new Schema(
             required: true,
             min: 1,
         },
-        priceByPerson:{
+        pricePerPerson:{
             type: Number,
+            required: true,
+        },
+        totalPrice:{
+        type: Number,
             required: true,
         },
         date:{
             type: Date,
             required: true,
         },
-        user:{
-            type: mongoose.Schema.Types.ObjectId,
+        owner:{
+            type: Schema.Types.ObjectId,
             ref: "User"
         }
-
     },
     {
         timestamps: true
