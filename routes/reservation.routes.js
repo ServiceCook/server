@@ -9,7 +9,6 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
   const { serviceId } = req.params;
 
   const {fullName, totalPerson, pricePerPerson, date} = req.body;
-  
 
   if(!mongoose.Types.ObjectId.isValid(serviceId)) {
     res.status(400).json({message: 'specific id is not valid'})
@@ -56,20 +55,25 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
 
 });
 
-router.get("/services/:serviceId/reserve", isAuthenticated, (req, res, next) => {
-  Reservation.find()
-      .populate({path: "user", select: "-password"})
-      .then(response => {
-          res.json(response)
-      })
-      .catch(err => {
-          console.log("error getting list of projects", err);
-          res.status(500).json({
-              message: "error getting list of projects",
-              error: err
-          });
-      })
 
-})
+router.get("/reservations", isAuthenticated, (req, res, next) => {
+  const userId = req.payload;
+
+  console.log(userId);
+
+  Reservation.find({ user: userId })
+    .populate({ path: "service", select: "serviceName" }) // Populate the service information
+    .then(reservations => {
+      res.json(reservations);
+    })
+    .catch(err => {
+      console.log("Failed to retrieve reservations", err);
+      res.status(500).json({
+        message: "Failed to retrieve reservations",
+        error: err
+      });
+    });
+});
+
 
 module.exports = router;
