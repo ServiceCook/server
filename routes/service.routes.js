@@ -76,16 +76,17 @@ router.put('/services/:serviceId', (req, res, next) => {
         res.status(400).json({message: 'Specified id is not valid'})
     };
 
+
     const newService = {
-        picture: req.bodypicture,
-        prestation: req.body.prestation,
+        picture: req.body.picture,
+        speciality: req.body.speciality,
         place: req.body.place,
-        price: req.body.price,
         description: req.body.description,
         amountOfPeople: req.body.amountOfPeople,
         pricePerPerson: req.body.pricePerPerson,
+        pricePerPerson: req.body.pricePerPerson,
+        totalPrice: req.body.totalPrice,
         date: req.body.date,
-        // user: []
       }
 
     Service.findByIdAndUpdate(serviceId, newService, { new: true })

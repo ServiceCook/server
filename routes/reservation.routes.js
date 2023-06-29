@@ -63,7 +63,7 @@ router.get("/reservations", isAuthenticated, (req, res, next) => {
 
   Reservation.find({ user: userId })
     .populate({ path: "service", select: "serviceName" }) // Populate the service information
-      .populate({path: "user", select: "-password"})
+    .populate({path: "user", select: "-password"})
     .then(reservations => {
       console.log(reservations);
       res.json(reservations);
