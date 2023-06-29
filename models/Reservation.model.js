@@ -15,7 +15,7 @@ const reservationModel = new Schema(
         },
         fullName: {
             type: String,
-            required: true
+            //required: true
         },
         totalPerson: {
             type: Number,

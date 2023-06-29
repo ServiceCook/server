@@ -57,6 +57,7 @@ router.get('/services/:serviceId', (req, res, next) => {
     };
 
     Service.findById(serviceId)
+        .populate({path: "owner", select: "-password"})
         .then(response => res.json(response))
         .catch(err => {
             console.log("error getting details of service", err)
