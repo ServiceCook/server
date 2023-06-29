@@ -1,14 +1,17 @@
-const {mongoose, Schema, model } = require("mongoose");
+const mongoose = require('mongoose');
+const { Schema, model } = require("mongoose");
 
 const reservationModel = new Schema(
     {
         user:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            // required: true
         },
         service:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Service"
+            type: Schema.Types.ObjectId,
+            ref: "Service",
+            required: true
         },
         fullName: {
             type: String,
@@ -26,6 +29,10 @@ const reservationModel = new Schema(
             type: Date,
             required: true
         },
+        totalPrice: {
+            type: Number,
+            required: true,
+        }
     },
     {
         timestamps: true
