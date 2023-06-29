@@ -33,7 +33,7 @@ const serviceModel = new Schema(
         },
         date:{
             type: Date,
-            required: true,
+        //    required: true,
         },
         owner:{
             type: Schema.Types.ObjectId,
