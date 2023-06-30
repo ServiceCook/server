@@ -4,14 +4,27 @@ const Reservation = require("../models/Reservation.model");
 const Service = require("../models/Service.model");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+const fileUploader = require("../config/cloudinary.config");
 
-router.post("/services", isAuthenticated, (req, res, next) => {
-  const {picture, speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
+
+
+router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+   
+    if (!req.file) {
+        next(new Error("No file uploaded!"));
+        return;
+      }
+      res.json({ fileUrl: req.file.path });
+    });
+     
+
+
+router.post("/services", isAuthenticated, fileUploader.single("picture"), (req, res, next) => {
+  const { speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
 
   console.log("give me something about this", req.payload )
 
   const newService = {
-    picture: picture,
     speciality: speciality,
     place: place,
     description: description,
@@ -78,7 +91,7 @@ router.put('/services/:serviceId', (req, res, next) => {
 
 
     const newService = {
-        picture: req.body.picture,
+        picture: req.file.path ,
         speciality: req.body.speciality,
         place: req.body.place,
         description: req.body.description,
