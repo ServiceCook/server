@@ -22,15 +22,16 @@ const serviceModel = new Schema(
             type:Number,
             required: true,
             min: 1,
+            default: 1,
         },
         pricePerPerson:{
             type: Number,
             required: true,
         },
-        // totalPrice:{
-        //     type: Number,
+        totalPrice:{
+             type: Number,
         //     required: true,
-        // },
+        },
         date:{
             type: Date,
         //    required: true,
@@ -38,7 +39,7 @@ const serviceModel = new Schema(
         owner:{
             type: Schema.Types.ObjectId,
             ref: "User",
-            // required: true
+            required: true
         }
     },
     {
