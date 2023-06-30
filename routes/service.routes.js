@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const Reservation = require("../models/Reservation.model");
 const Service = require("../models/Service.model");
 const User = require("../models/User.model");
+const ReviewModel = require("../models/Review.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+
 
 router.post("/services", isAuthenticated, (req, res, next) => {
   const {picture, speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
@@ -19,6 +21,7 @@ router.post("/services", isAuthenticated, (req, res, next) => {
     pricePerPerson: pricePerPerson,
     totalPrice: totalPrice,
     date: date,
+    reviews: [],
     owner: req.payload._id
   }
 

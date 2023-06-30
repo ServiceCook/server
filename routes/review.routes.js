@@ -1,19 +1,27 @@
 const { mongoose } = require("mongoose");
 const router = require("express").Router();
-const Review = require("../models/Review.model");
 const Service = require("../models/Service.model");
+const ReviewModel = require("../models/Review.model");
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
-router.post("/reviews", (req, res, next) => {
+
+router.post("/reviews", isAuthenticated, (req, res, next) => {
   const { description, serviceId } = req.body;
+
+  console.log("is this the service Id",serviceId);
 
   const newReview = {
     description: description,
     serviceId: serviceId
   };
 
-  Review.create(newReview)
+
+  ReviewModel.create(newReview)
     .then(review => {
-      return Service.findByIdAndUpdate(serviceId, {$push: {review: review._id }})
+      console.log("we are inside service now after creating the new review", serviceId);
+      console.log("review details", review);
+
+      return Service.findByIdAndUpdate(serviceId, {$push: {reviews: review._id }},  {returnDocument: 'after'})
     })
     .then(response => res.status(201).json(response))
     .catch(err => {
@@ -23,4 +31,21 @@ router.post("/reviews", (req, res, next) => {
         error: err
       })
     })
-})
+});
+
+
+router.get("/reviews", isAuthenticated, (req, res, next) => {
+  ReviewModel.find()
+    .then(response => {
+      res.json(response)
+    })
+    .catch(err => {
+      console.log("error getting the list of reviews", err);
+      res.status(500).json({
+        message: "error getting the list of reviews",
+        error: err
+      })
+    })
+} )
+
+module.exports = router;

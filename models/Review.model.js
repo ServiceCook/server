@@ -1,13 +1,9 @@
-const { mongoose } = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema, model } = require("mongoose");
-
 
 const reviewSchema = new Schema (
   {
-    description: {
-      type: string,
-      // required: true 
-    },
+    description: String,
     service: {
       type: Schema.Types.ObjectId,
       ref: "Service"
