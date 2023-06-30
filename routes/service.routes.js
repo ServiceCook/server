@@ -17,8 +17,6 @@ router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
       res.json({ picture: req.file.path });
     });
      
-
-
 router.post("/services", isAuthenticated, (req, res, next) => {
   const {picture, speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
 
@@ -33,7 +31,7 @@ router.post("/services", isAuthenticated, (req, res, next) => {
     pricePerPerson: pricePerPerson,
     totalPrice: totalPrice,
     date: date,
-    owner: req.payload._id
+    owner: req.payload._id,
   }
 
   Service.create(newService)
@@ -72,6 +70,7 @@ router.get('/services/:serviceId', (req, res, next) => {
 
     Service.findById(serviceId)
         .populate({path: "owner", select: "-password"})
+        .populate('reviews')
         .then(response => res.json(response))
         .catch(err => {
             console.log("error getting details of service", err)

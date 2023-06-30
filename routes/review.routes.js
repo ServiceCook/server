@@ -1,4 +1,4 @@
-const { mongoose } = require("mongoose");
+const  mongoose  = require("mongoose");
 const router = require("express").Router();
 const Service = require("../models/Service.model");
 const ReviewModel = require("../models/Review.model");
@@ -8,19 +8,17 @@ const { isAuthenticated } = require("../middleware/jwt.middleware");
 router.post("/reviews", isAuthenticated, (req, res, next) => {
   const { description, serviceId } = req.body;
 
-  console.log("is this the service Id",serviceId);
+  console.log("is this the service Id", req.payload.name);
 
   const newReview = {
     description: description,
-    serviceId: serviceId
+    serviceId: serviceId,
   };
 
 
   ReviewModel.create(newReview)
     .then(review => {
-      console.log("we are inside service now after creating the new review", serviceId);
-      console.log("review details", review);
-
+      console.log(review, "tell what is this");
       return Service.findByIdAndUpdate(serviceId, {$push: {reviews: review._id }},  {returnDocument: 'after'})
     })
     .then(response => res.status(201).json(response))
@@ -32,7 +30,6 @@ router.post("/reviews", isAuthenticated, (req, res, next) => {
       })
     })
 });
-
 
 router.get("/reviews", isAuthenticated, (req, res, next) => {
   ReviewModel.find()

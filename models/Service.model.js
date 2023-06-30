@@ -18,9 +18,19 @@ const serviceModel = new Schema(
             type: String,
             required: true,
         },
+        amountOfPeople:{
+            type:Number,
+            required: true,
+            min: 1,
+            default: 1,
+        },
         pricePerPerson:{
             type: Number,
             required: true,
+        },
+        totalPrice:{
+             type: Number,
+        //     required: true,
         },
         date:{
             type: Date,
@@ -35,6 +45,7 @@ const serviceModel = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Review"
         }]
+      
     },
     {
         timestamps: true
