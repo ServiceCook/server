@@ -56,26 +56,5 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
 });
 
 
-router.get("/reservations", isAuthenticated, (req, res, next) => {
-  const userId = req.payload;
-
-  console.log(userId);
-
-  Reservation.find({ user: userId })
-    .populate({ path: "service", select: "serviceName" }) // Populate the service information
-    .populate({path: "user", select: "-password"})
-    .then(reservations => {
-      console.log(reservations);
-      res.json(reservations);
-    })
-    .catch(err => {
-      console.log("Failed to retrieve reservations", err);
-      res.status(500).json({
-        message: "Failed to retrieve reservations",
-        error: err
-      });
-    });
-});
-
 
 module.exports = router;
