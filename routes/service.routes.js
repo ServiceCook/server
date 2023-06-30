@@ -8,23 +8,24 @@ const fileUploader = require("../config/cloudinary.config");
 
 
 
-router.post("/upload", fileUploader.single("imageUrl"), (req, res, next) => {
+router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
    
     if (!req.file) {
         next(new Error("No file uploaded!"));
         return;
       }
-      res.json({ fileUrl: req.file.path });
+      res.json({ picture: req.file.path });
     });
      
 
 
-router.post("/services", isAuthenticated, fileUploader.single("picture"), (req, res, next) => {
-  const { speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
+router.post("/services", isAuthenticated, (req, res, next) => {
+  const {picture, speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
 
   console.log("give me something about this", req.payload )
 
   const newService = {
+    picture: picture,
     speciality: speciality,
     place: place,
     description: description,
