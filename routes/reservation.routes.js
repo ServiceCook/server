@@ -55,6 +55,96 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
 
 });
 
+router.get("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
+  const { reservationId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+
+  Reservation.findById(reservationId)
+    .populate("service")
+    .populate("user", "-password")
+    .then(reservation => {
+      if (!reservation) {
+        res.status(404).json({ message: "Reservation not found" });
+        return;
+      }
+
+      res.json(reservation);
+    })
+    .catch(err => {
+      console.log("Failed to find the reservation", err);
+      res.status(500).json({
+        message: "Failed to find the reservation",
+        error: err
+      });
+    });
+});
+
+
+router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
+  const { reservationId } = req.params;
+  const { fullName, totalPerson, pricePerPerson, date } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+
+  Reservation.findByIdAndUpdate(
+    reservationId,
+    {
+      fullName: fullName,
+      totalPerson: totalPerson,
+      pricePerPerson: pricePerPerson,
+      totalPrice: totalPerson * pricePerPerson,
+      date: date
+    },
+    { new: true }
+  )
+    .then(updatedReservation => {
+      if (!updatedReservation) {
+        res.status(404).json({ message: "Reservation not found" });
+        return;
+      }
+      res.json(updatedReservation);
+    })
+    .catch(err => {
+      console.log("Failed to update the reservation", err);
+      res.status(500).json({
+        message: "Failed to update the reservation",
+        error: err
+      });
+    });
+});
+
+router.delete("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
+  const { reservationId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+    res.status(400).json({ message: "Specified id is not valid" });
+    return;
+  }
+
+  Reservation.findByIdAndRemove(reservationId)
+    .then(deletedReservation => {
+      if (!deletedReservation) {
+        res.status(404).json({ message: "Reservation not found" });
+        return;
+      }
+      res.json({ message: `Reservation with id ${reservationId} was removed successfully.` });
+    })
+    .catch(err => {
+      console.log("Failed to delete the reservation", err);
+      res.status(500).json({
+        message: "Failed to delete the reservation",
+        error: err
+      });
+    });
+});
+
 
 
 module.exports = router;

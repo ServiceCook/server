@@ -43,6 +43,67 @@ router.get("/reviews", isAuthenticated, (req, res, next) => {
         error: err
       })
     })
-} )
+} );
+
+router.get('/reviews/:reviewId', (req, res, next) => {
+    
+  const { reviewId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      res.status(400).json({ message: 'Specified id is not valid' });
+      return;
+  }
+
+  ReviewModel.findById(reviewId)
+      .then(review => res.json(review))
+      .catch(err => {
+          console.log("error getting details of a project", err);
+          res.status(500).json({
+              message: "error getting details of a project",
+              error: err
+          });
+      })
+});
+
+router.put('/reviews/:reviewId', (req, res, next) => {
+  const { reviewId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      res.status(400).json({ message: 'Specified id is not valid' });
+      return;
+  }
+
+  const newDetails = { description: req.body.description }
+
+  ReviewModel.findByIdAndUpdate(reviewId, newDetails, { new: true })
+      .then((updateReview) => res.json(updateReview))
+      .catch(err => {
+          console.log("error updating project", err);
+          res.status(500).json({
+              message: "error updating project",
+              error: err
+          });
+      })
+});
+
+
+router.delete('/reviews/:reviewId', (req, res, next) => {
+  const { reviewId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      res.status(400).json({ message: 'Specified id is not valid' });
+      return;
+  }
+
+  ReviewModel.findByIdAndRemove(reviewId)
+      .then(() => res.json({ message: `Project with id ${reviewId} & all associated tasks were removed successfully.` }))
+      .catch(err => {
+          console.log("error deleting project", err);
+          res.status(500).json({
+              message: "error deleting project",
+              error: err
+          });
+      })
+});
 
 module.exports = router;

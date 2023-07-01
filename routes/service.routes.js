@@ -82,8 +82,10 @@ router.get('/services/:serviceId', (req, res, next) => {
 
 });
 
-router.put('/services/:serviceId', (req, res, next) => {
+router.put('/services/:serviceId', fileUploader.single("picture"), (req, res, next) => {
     const { serviceId } = req.params;
+
+    console.log(serviceId, "tell me this data");
 
     if(!mongoose.Types.ObjectId.isValid(serviceId)) {
         res.status(400).json({message: 'Specified id is not valid'})
@@ -91,7 +93,8 @@ router.put('/services/:serviceId', (req, res, next) => {
 
 
     const newService = {
-        picture: req.file.path ,
+         //picture: req.file ? req.file.path : "",
+        // picture: req.file.path,
         speciality: req.body.speciality,
         place: req.body.place,
         description: req.body.description,
@@ -102,8 +105,16 @@ router.put('/services/:serviceId', (req, res, next) => {
         date: req.body.date,
       }
 
+      if (req.file) {
+        newService.picture = req.file.path;
+      }
+
     Service.findByIdAndUpdate(serviceId, newService, { new: true })
-        .then(updateService => res.json(updateService))
+        .then(updateService => {
+            console.log(updateService);
+            res.json(updateService)
+            
+        })
         .catch(err => {
             console.log('error updating the service', err)
             res.status(500).json({
