@@ -7,7 +7,6 @@ const { isAuthenticated } = require("../middleware/jwt.middleware");
 const fileUploader = require("../config/cloudinary.config");
 
 
-
 router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
    
     if (!req.file) {
@@ -18,7 +17,7 @@ router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
     });
      
 router.post("/services", isAuthenticated, (req, res, next) => {
-  const {picture, speciality, place, description, amountOfPeople, pricePerPerson, totalPrice, date } = req.body;
+  const {picture, speciality, place, description, pricePerPerson, } = req.body;
 
   console.log("give me something about this", req.payload )
 
@@ -27,10 +26,7 @@ router.post("/services", isAuthenticated, (req, res, next) => {
     speciality: speciality,
     place: place,
     description: description,
-    amountOfPeople: amountOfPeople,
     pricePerPerson: pricePerPerson,
-    totalPrice: totalPrice,
-    date: date,
     owner: req.payload._id,
   }
 
@@ -98,16 +94,12 @@ router.put('/services/:serviceId', fileUploader.single("picture"), (req, res, ne
         speciality: req.body.speciality,
         place: req.body.place,
         description: req.body.description,
-        amountOfPeople: req.body.amountOfPeople,
         pricePerPerson: req.body.pricePerPerson,
-        pricePerPerson: req.body.pricePerPerson,
-        totalPrice: req.body.totalPrice,
-        date: req.body.date,
       }
 
       if (req.file) {
         newService.picture = req.file.path;
-      }
+      } // instead of put in the new serivce, instead put outside
 
     Service.findByIdAndUpdate(serviceId, newService, { new: true })
         .then(updateService => {
