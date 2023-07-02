@@ -18,24 +18,10 @@ const serviceModel = new Schema(
             type: String,
             required: true,
         },
-        // amountOfPeople:{
-        //     type:Number,
-        //     required: true,
-        //     min: 1,
-        //     default: 1,
-        // },
         pricePerPerson:{
             type: Number,
             required: true,
         },
-        // totalPrice:{
-        //      type: Number,
-        // //     required: true,
-        // },
-        // date:{
-        //     type: Date,
-        // //    required: true,
-        // },
         owner:{
             type: Schema.Types.ObjectId,
             ref: "User",
