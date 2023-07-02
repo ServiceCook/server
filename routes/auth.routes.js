@@ -12,16 +12,18 @@ const User = require("../models/User.model");
 
 // Require necessary (isAuthenticated) middleware in order to control access to specific routes
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
+const fileUploader = require("../config/cloudinary.config");
+
 
 // How many rounds should bcrypt run the salt (default - 10 rounds)
 const saltRounds = 10;
 
 // POST /auth/signup  - Creates a new user in the database
-router.post("/signup", (req, res, next) => {
-  const { email, password, name } = req.body;
+router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
+  const { email, password, name, address, picture } = req.body;
 
   // Check if email or password or name are provided as empty strings
-  if (email === "" || password === "" || name === "") {
+  if (email === "" || password === "" || name === "" || address === "" || picture === "") {
     res.status(400).json({ message: "Provide email, password and name" });
     return;
   }
@@ -55,24 +57,37 @@ router.post("/signup", (req, res, next) => {
       // If email is unique, proceed to hash the password
       const salt = bcrypt.genSaltSync(saltRounds);
       const hashedPassword = bcrypt.hashSync(password, salt);
+      
+      //upload picture
+      let pictureUrl = "";
+      if(req.file) {
+        pictureUrl = req.file.path;
+      }
 
       // Create the new user in the database
       // We return a pending promise, which allows us to chain another `then`
-      return User.create({ email, password: hashedPassword, name });
+      return User.create({ email, password: hashedPassword, name, address, picture: pictureUrl });
     })
     .then((createdUser) => {
       // Deconstruct the newly created user object to omit the password
       // We should never expose passwords publicly
-      const { email, name, _id } = createdUser;
+      const { email, name, _id, address, picture } = createdUser;
 
       // Create a new object that doesn't expose the password
-      const user = { email, name, _id };
+      const user = { email, name, _id, address, picture };
 
       // Send a json response containing the user object
       res.status(201).json({ user: user });
     })
     .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
 });
+
+//profile routes
+router.get("/profile", isAuthenticated, (req, res, next) => {
+  const {_id, email, name, address, picture} = req.payload;
+  res.status(200).json({_id, email, name, picture})
+})
+
 
 // POST  /auth/login - Verifies email and password and returns a JWT
 router.post("/login", (req, res, next) => {
