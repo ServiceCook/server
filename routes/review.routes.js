@@ -6,13 +6,14 @@ const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 
 router.post("/reviews", isAuthenticated, (req, res, next) => {
-  const { description, serviceId } = req.body;
+  const { description, serviceId, rating } = req.body;
 
   console.log("is this the service Id", req.payload.name);
 
   const newReview = {
     description: description,
     serviceId: serviceId,
+    rating: rating
   };
 
 
@@ -73,7 +74,7 @@ router.put('/reviews/:reviewId', (req, res, next) => {
       return;
   }
 
-  const newDetails = { description: req.body.description }
+  const newDetails = { description: req.body.description, rating: req.body.rating }
 
   ReviewModel.findByIdAndUpdate(reviewId, newDetails, { new: true })
       .then((updateReview) => res.json(updateReview))

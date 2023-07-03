@@ -7,6 +7,10 @@ const reviewSchema = new Schema (
     service: {
       type: Schema.Types.ObjectId,
       ref: "Service"
+    },
+    rating: {
+      type: Number,
+      required: true,
     }
   },
   {

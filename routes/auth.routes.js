@@ -110,29 +110,30 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
       // Send a json response containing the user object
       res.status(201).json({ user: user });
 
+      // Transporter code
+      const transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+          user: "chefontheway003@gmail.com",
+          pass: "chef@onTheWayProject-3"
+        }
+      });
+
       // // Send email to the user
-      // const transporter = nodemailer.createTransport({
-      //   service: "Gmail",
-      //   auth: {
-      //     user: "chefontheway003@gmail.com",
-      //     pass: "chef@onTheWayProject-3"
-      //   }
-      // });
+      const mailOptions = {
+        from: "chefontheway003@gmail.com",
+        to: email,
+        subject: "Welcome to Chef On The Way Platform",
+        text: `Dear ${name}, \n\nThank you for signing up at our website. We are exicted to have you on board!\n\nBest regards,\nThe Chef On The Way Team`
+      }
 
-      // const mailOptions = {
-      //   from: "chefontheway003@gmail.com",
-      //   to: email,
-      //   subject: "Welcome to Chef On The Way Platform",
-      //   text: `Dear ${name}, \n\nThank you for signing up at our website. We are exicted to have you on board!\n\nBest regards,\nThe Chef On The Way Team`
-      // }
-
-      // transporter.sendMail(mailOptions, (error, info) => {
-      //   if(error) {
-      //     console.error("Error sending welcome email", error)
-      //   } else {
-      //     console.log("Welcome email sent:", info.response)
-      //   }
-      // })
+      transporter.sendMail(mailOptions, (error, info) => {
+        if(error) {
+          console.error("Error sending welcome email", error)
+        } else {
+          console.log("Welcome email sent:", info.response)
+        }
+      })
 
     })
     .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
