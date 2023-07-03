@@ -6,7 +6,6 @@ const User = require("../models/User.model");
 
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
-
 router.get('/myService', isAuthenticated, (req, res, next) => {
     const userId = req.payload._id
     console.log(userId)

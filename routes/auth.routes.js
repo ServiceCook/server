@@ -12,11 +12,27 @@ const User = require("../models/User.model");
 
 // Require necessary (isAuthenticated) middleware in order to control access to specific routes
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
-const fileUploader = require("../config/cloudinary.config");
 
+// Require cloudinary
+const fileUploader = require("../config/cloudinary.config");
 
 // How many rounds should bcrypt run the salt (default - 10 rounds)
 const saltRounds = 10;
+
+// Require email validator
+const emailValidator = require("email-validator");
+
+// Require nodemailer
+const nodemailer = require("nodemailer");
+
+router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
+  if(!req.file) {
+    next(new Error("No file uploaded!"));
+    return;
+  }
+  res.json({picture: req.file.path})
+})
+
 
 // POST /auth/signup  - Creates a new user in the database
 router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
@@ -25,6 +41,21 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
   // Check if email or password or name are provided as empty strings
   if (email === "" || password === "" || name === "" || address === "" || picture === "") {
     res.status(400).json({ message: "Provide email, password and name" });
+    return;
+  };
+
+  // Check if the email is from a valid provider
+  const validEmailProvider = ["gmail.com", "yahoo.com", "outlook.com"];
+  const emailParts = email.split("@");
+  if(emailParts.length !== 2 || !validEmailProvider.includes(emailParts[1])) {
+    res.status(400).json({message: "Please sign up with a valid email from one of the supported providers"})
+    return;
+  }
+
+  // // Check if the email address is valid and exists
+  const isEmailValid = emailValidator.validate(email);
+  if(!isEmailValid) {
+    res.status(400).json({message: "Please provide a valid email address"})
     return;
   }
 
@@ -78,6 +109,31 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
 
       // Send a json response containing the user object
       res.status(201).json({ user: user });
+
+      // // Send email to the user
+      // const transporter = nodemailer.createTransport({
+      //   service: "Gmail",
+      //   auth: {
+      //     user: "chefontheway003@gmail.com",
+      //     pass: "chef@onTheWayProject-3"
+      //   }
+      // });
+
+      // const mailOptions = {
+      //   from: "chefontheway003@gmail.com",
+      //   to: email,
+      //   subject: "Welcome to Chef On The Way Platform",
+      //   text: `Dear ${name}, \n\nThank you for signing up at our website. We are exicted to have you on board!\n\nBest regards,\nThe Chef On The Way Team`
+      // }
+
+      // transporter.sendMail(mailOptions, (error, info) => {
+      //   if(error) {
+      //     console.error("Error sending welcome email", error)
+      //   } else {
+      //     console.log("Welcome email sent:", info.response)
+      //   }
+      // })
+
     })
     .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
 });
@@ -85,7 +141,8 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
 //profile routes
 router.get("/profile", isAuthenticated, (req, res, next) => {
   const {_id, email, name, address, picture} = req.payload;
-  res.status(200).json({_id, email, name, picture})
+  res.status(200).json({_id, email, name, address, picture})
+  console.log(req.payload, "this data coming form line 95");
 })
 
 
@@ -113,12 +170,12 @@ router.post("/login", (req, res, next) => {
 
       if (passwordCorrect) {
         // Deconstruct the user object to omit the password
-        const { _id, email, name } = foundUser;
+        const { _id, email, name, address, picture } = foundUser;
 
         // Create an object that will be set as the token payload
-        const payload = { _id, email, name };
+        const payload = { _id, email, name, address, picture };
 
-        console.log(payload, "this console log coming from auth.routes line 106");
+        console.log(payload, "this console log coming from auth.routes line 127");
 
         // Create a JSON Web Token and sign it
         const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
@@ -143,6 +200,7 @@ router.get("/verify", isAuthenticated, (req, res, next) => {
 
   // Send back the token payload object containing the user data
   res.status(200).json(req.payload);
+  console.log(req.payload);
 });
 
 module.exports = router;
