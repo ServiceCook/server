@@ -17,7 +17,7 @@ router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
     });
      
 router.post("/services", isAuthenticated, (req, res, next) => {
-  const {picture, speciality, place, description, pricePerPerson, } = req.body;
+  const {picture, speciality, place, description, pricePerPerson, availability } = req.body;
 
   console.log("give me something about this", req.payload )
 
@@ -27,11 +27,15 @@ router.post("/services", isAuthenticated, (req, res, next) => {
     place: place,
     description: description,
     pricePerPerson: pricePerPerson,
+    availability: availability,
     owner: req.payload._id,
   }
 
   Service.create(newService)
-    .then(response => res.status(201).json(response))
+    .then(response => {
+        console.log(response.data);
+        res.status(201).json(response)
+    })
     .catch(err => {
         console.log("error creating a new project", err);
         res.status(500).json({
@@ -95,6 +99,7 @@ router.put('/services/:serviceId', fileUploader.single("picture"), (req, res, ne
         place: req.body.place,
         description: req.body.description,
         pricePerPerson: req.body.pricePerPerson,
+        availability: req.body.availability
       }
 
       if (req.file) {

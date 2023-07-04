@@ -27,6 +27,10 @@ const serviceModel = new Schema(
             ref: "User",
             required: true
         },
+        availability: {
+            type: String,
+            required: true
+        },
         reviews: [{
             type: Schema.Types.ObjectId,
             ref: "Review"
