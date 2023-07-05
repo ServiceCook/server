@@ -97,6 +97,26 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
       // Send a json response containing the user object
       res.status(201).json({ user: user });
 
+      //Welcome text
+      const html = `
+        <h2>Welcome on board</h2>
+        <p>Dear ${name},
+
+          Welcome to our platform! We're thrilled to have you on board. Thank you for joining our community. <br /> <br /> <br />
+          
+          With our platform, you can find a lot of amazing food service you like. <br /> <br />
+          
+          If you have any questions or need assistance, our support team is here to help. <br /> <br />
+          Feel free to reach out to us at [support email or contact information]. <br /> <br />
+          
+          Once again, welcome! We hope you have a fantastic experience using our platform. <br /> <br /> <br /> <br />
+          
+          <p>Best regards,</p>
+          <h4>Chef On The Way</h4>
+        </p>
+      `;
+
+
       // Transporter code
       let transporter = nodemailer.createTransport({
         service: "gmail",
@@ -110,8 +130,9 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
       const mailOptions = {
         from: "chefontheway003@gmail.com",
         to: email,
-        subject: "Welcome to Chef On The Way Platform",
-        text: "Welcome on board. Feel free to reserve or offer your service on this platform."
+        subject: "Welcome to Chef On The Way",
+        // text: "Welcome on board. Feel free to reserve or offer your service on this platform."
+        html: html
       }
 
       transporter.sendMail(mailOptions, (error, info) => {
