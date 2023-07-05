@@ -11,6 +11,16 @@ const reviewSchema = new Schema (
     rating: {
       type: Number,
       required: true,
+    },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    },
+    name: {
+      type: String
+    },
+    picture: {
+      type: String
     }
   },
   {

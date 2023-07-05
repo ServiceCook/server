@@ -71,7 +71,7 @@ router.get('/services/:serviceId', (req, res, next) => {
     Service.findById(serviceId)
         .populate({path: "owner", select: "-password"})
         .populate('reviews')
-        .then(response => res.json(response))
+        .then(response => {res.json(response)})
         .catch(err => {
             console.log("error getting details of service", err)
             res.status(500).json({
@@ -93,8 +93,6 @@ router.put('/services/:serviceId', fileUploader.single("picture"), (req, res, ne
 
 
     const newService = {
-         //picture: req.file ? req.file.path : "",
-        // picture: req.file.path,
         speciality: req.body.speciality,
         place: req.body.place,
         description: req.body.description,

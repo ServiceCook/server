@@ -7,13 +7,20 @@ const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 router.post("/reviews", isAuthenticated, (req, res, next) => {
   const { description, serviceId, rating } = req.body;
+  const owner = req.payload._id;
 
-  console.log("is this the service Id", req.payload.name);
+  const name = req.payload.name;
+  const picture = req.payload.picture; 
+  console.log(name + picture, "my id in review");
+  
 
   const newReview = {
     description: description,
     serviceId: serviceId,
-    rating: rating
+    rating: rating,
+    owner: owner,
+    name: name,
+    picture: picture
   };
 
 
@@ -34,7 +41,9 @@ router.post("/reviews", isAuthenticated, (req, res, next) => {
 
 router.get("/reviews", isAuthenticated, (req, res, next) => {
   ReviewModel.find()
+    .populate({path: "owner", select: "-password"})
     .then(response => {
+      console.log(response);
       res.json(response)
     })
     .catch(err => {
@@ -56,6 +65,7 @@ router.get('/reviews/:reviewId', (req, res, next) => {
   }
 
   ReviewModel.findById(reviewId)
+      .populate({path: "owner", select: "-password"})
       .then(review => res.json(review))
       .catch(err => {
           console.log("error getting details of a project", err);
