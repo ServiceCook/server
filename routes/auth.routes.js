@@ -20,7 +20,7 @@ const fileUploader = require("../config/cloudinary.config");
 const saltRounds = 10;
 
 // Require email validator
-const emailValidator = require("email-validator");
+const emailValidator = require('deep-email-validator')
 
 // Require nodemailer
 const nodemailer = require("nodemailer");
@@ -52,19 +52,6 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
     return;
   }
 
-  // // Check if the email address is valid and exists
-  const isEmailValid = emailValidator.validate(email);
-  if(!isEmailValid) {
-    res.status(400).json({message: "Please provide a valid email address"})
-    return;
-  }
-
-  // This regular expression check that the email is of a valid format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-  if (!emailRegex.test(email)) {
-    res.status(400).json({ message: "Provide a valid email address." });
-    return;
-  }
 
   // This regular expression checks password for special characters and minimum length
   const passwordRegex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
@@ -111,11 +98,11 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
       res.status(201).json({ user: user });
 
       // Transporter code
-      const transporter = nodemailer.createTransport({
-        service: "Gmail",
+      let transporter = nodemailer.createTransport({
+        service: "gmail",
         auth: {
-          user: "chefontheway003@gmail.com",
-          pass: "chef@onTheWayProject-3"
+          user: process.env.MAIL_USERNAME,
+          pass: process.env.MAIL_PASSWORD
         }
       });
 
@@ -124,7 +111,7 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
         from: "chefontheway003@gmail.com",
         to: email,
         subject: "Welcome to Chef On The Way Platform",
-        text: `Dear ${name}, \n\nThank you for signing up at our website. We are exicted to have you on board!\n\nBest regards,\nThe Chef On The Way Team`
+        text: "Welcome on board. Feel free to reserve or offer your service on this platform."
       }
 
       transporter.sendMail(mailOptions, (error, info) => {
