@@ -45,7 +45,7 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
   };
 
   // Check if the email is from a valid provider
-  const validEmailProvider = ["gmail.com", "yahoo.com", "outlook.com"];
+  const validEmailProvider = ["gmail.com", "yahoo.com", "outlook.com", "zoho.com"];
   const emailParts = email.split("@");
   if(emailParts.length !== 2 || !validEmailProvider.includes(emailParts[1])) {
     res.status(400).json({message: "Please sign up with a valid email from one of the supported providers"})
@@ -131,7 +131,6 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
         from: "chefontheway003@gmail.com",
         to: email,
         subject: "Welcome to Chef On The Way",
-        // text: "Welcome on board. Feel free to reserve or offer your service on this platform."
         html: html
       }
 
