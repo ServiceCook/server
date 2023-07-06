@@ -17,11 +17,10 @@ let transporter = nodemailer.createTransport({
 });
 
 
-
 router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) => {
   const { serviceId } = req.params;
 
-  const {fullName, totalPerson, pricePerPerson, date} = req.body;
+  const {fullName, totalPerson, pricePerPerson, date, hour} = req.body;
 
   if(!mongoose.Types.ObjectId.isValid(serviceId)) {
     res.status(400).json({message: 'specific id is not valid'})
@@ -52,27 +51,34 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
         pricePerPerson: pricePerPerson,
         totalPrice: (totalPerson * pricePerPerson),
         date: date,
+        hour: hour
       });
 
       newReservation.save()
         .then(savedReservation => {
-          //transporter(email, (success, error) => {})
-          console.log(savedReservation, "tell me this saved reservation") ;
+
+          console.log(req.payload.address, "tell me this address") ;
           res.status(201).json(savedReservation)
           const ownerEmail = service.owner.email;
-          console.log(ownerEmail);
 
           const html = `
-            <h2>Here are below the details of your new reservation:</h2>
-            <p><strong>Full Name:</strong> ${savedReservation.fullName}</p>
+            <h2>Below are the details of your new reservation:</h2>
+            <p><strong>Name:</strong> ${savedReservation.fullName}</p>
             <p><strong>User Email:</strong> <strong>${req.payload.email}</strong> </p>
-            <p><strong>Total Person:</strong> ${savedReservation.totalPerson}</p>
+            <p><strong>Total Persons:</strong> ${savedReservation.totalPerson}</p>
+            <p><strong>Address:</strong> ${req.payload.address}</p>
             <p><strong>Date:</strong> ${savedReservation.date}</p>
+            <p><strong>Hour:</strong> ${savedReservation.hour}</p>
             <p><strong>Price Per Person:</strong> ${savedReservation.pricePerPerson} €</p>
             <p><strong>Total Price:</strong> ${savedReservation.totalPrice} €</p>
-            <br /> <br />
-            <p><strong>Noted:</strong>If you have some detail requirements, please email this owner</p>
-            <p><strong>${ownerEmail}</strong></p>
+            <br />
+            <p><strong>Noted:</strong> If you have some detailed requirements, please email this owner at ${ownerEmail}!</p>
+            <br /> <br /> <br />
+            <p>Best regards,</p>
+            <h4>Chef On The Way</h4>
+            <h4>Pierre Docquin and Solideo Zendrato</h4>
+            <p><strong>chefontheway003@gmail.com</strong></p>
+            <img src="https://imgur.com/AVjelAu" style="width: 300px"/>
           `;
 
 
@@ -175,7 +181,8 @@ router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => 
       totalPerson: totalPerson,
       pricePerPerson: pricePerPerson,
       totalPrice: totalPerson * pricePerPerson,
-      date: date
+      date: date,
+      hour: hour
     },
     { new: true }
   )

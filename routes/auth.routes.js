@@ -113,6 +113,9 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
           
           <p>Best regards,</p>
           <h4>Chef On The Way</h4>
+          <h4>Pierre Docquin and Solideo Zendrato</h4>
+          <p><strong>chefontheway003@gmail.com</strong></p>
+          <img src="https://imgur.com/AVjelAu" style="width: 300px"/>
         </p>
       `;
 

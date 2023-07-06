@@ -29,6 +29,10 @@ const reservationModel = new Schema(
             type: Date,
             required: true
         },
+        hour: {
+            type: String,
+            required: true
+        },
         totalPrice: {
             type: Number,
             required: true,
