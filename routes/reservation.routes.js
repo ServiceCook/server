@@ -6,7 +6,6 @@ const Service = require("../models/Service.model");
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
-
 // Transporter code
 let transporter = nodemailer.createTransport({
   service: "gmail",
