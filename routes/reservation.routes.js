@@ -123,6 +123,30 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
 });
 
 
+router.get("/reservations/all", isAuthenticated, (req, res, next) => {
+  Reservation.find({})
+    .populate({
+      path: "service",
+      populate: {
+        path: "owner",
+        select: "email"
+      }
+    })
+    .populate("user", "-password")
+    .then(reservations => {
+      res.json(reservations);
+    })
+    .catch(err => {
+      console.log("Failed to fetch reservations", err);
+      res.status(500).json({
+        message: "Failed to fetch reservations",
+        error: err
+      });
+    });
+});
+
+
+
 router.get("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
   const { reservationId } = req.params;
 
@@ -162,8 +186,6 @@ router.get("/reservations/:reservationId", isAuthenticated, (req, res, next) => 
 });
 
 
-
-
 router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
   const { reservationId } = req.params;
   const { fullName, totalPerson, pricePerPerson, date, hour } = req.body;
@@ -185,11 +207,59 @@ router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => 
     },
     { new: true }
   )
+    .populate({
+      path: "service",
+      populate: {
+        path: "owner",
+        select: "email"
+      }
+    })
+    .populate("user", "-password")
     .then(updatedReservation => {
       if (!updatedReservation) {
         res.status(404).json({ message: "Reservation not found" });
         return;
       }
+
+      const ownerEmail = updatedReservation.service.owner.email;
+      const userEmail = updatedReservation.user.email;
+
+      const html = `
+        <h2>Your reservation has been updated:</h2>
+        <p><strong>Name:</strong> ${updatedReservation.user.name}</p>
+        <p><strong>User Email:</strong> <strong>${userEmail}</strong> </p>
+        <p><strong>Total Persons:</strong> ${updatedReservation.totalPerson}</p>
+        <p><strong>Address:</strong> ${updatedReservation.user.address}</p>
+        <p><strong>Date:</strong> ${updatedReservation.date}</p>
+        <p><strong>Hour:</strong> ${updatedReservation.hour}</p>
+        <p><strong>Price Per Person:</strong> ${updatedReservation.pricePerPerson} €</p>
+        <p><strong>Total Price:</strong> ${updatedReservation.totalPrice} €</p>
+        <p><strong>Service by:</strong> ${updatedReservation.fullName} </p>
+        <br />
+        <p><strong>Noted:</strong> If you have some detailed requirements, please email the owner at ${ownerEmail}!</p>
+        <br /> <br /> <br />
+        <p>Best regards,</p>
+        <h4>Chef On The Way</h4>
+        <h4>Pierre Docquin and Solideo Zendrato</h4>
+        <p><strong>chefontheway003@gmail.com</strong></p>
+      `;
+
+      // Send email to the owner and user
+      const mailOptions = {
+        from: "chefontheway003@gmail.com",
+        to: `${ownerEmail}, ${userEmail}`,
+        subject: "Updated Reservation",
+        html: html
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error sending updated reservation email", error);
+        } else {
+          console.log("Updated reservation email sent:", info.response);
+        }
+      });
+
       res.json(updatedReservation);
     })
     .catch(err => {
@@ -200,6 +270,10 @@ router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => 
       });
     });
 });
+
+
+
+
 
 router.delete("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
   const { reservationId } = req.params;
