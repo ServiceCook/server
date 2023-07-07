@@ -78,7 +78,6 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
             <h4>Chef On The Way</h4>
             <h4>Pierre Docquin and Solideo Zendrato</h4>
             <p><strong>chefontheway003@gmail.com</strong></p>
-            <img src="https://imgur.com/AVjelAu" style="width: 300px"/>
           `;
 
 
@@ -167,7 +166,7 @@ router.get("/reservations/:reservationId", isAuthenticated, (req, res, next) => 
 
 router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => {
   const { reservationId } = req.params;
-  const { fullName, totalPerson, pricePerPerson, date } = req.body;
+  const { fullName, totalPerson, pricePerPerson, date, hour } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(reservationId)) {
     res.status(400).json({ message: "Specified id is not valid" });

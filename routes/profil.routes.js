@@ -10,7 +10,6 @@ router.get('/myService', isAuthenticated, (req, res, next) => {
     const userId = req.payload._id
     console.log(userId)
     Service.find({owner: userId})
-        // .populate({path: "owner", select: "-password"})
         .then(response => {
             console.log(response);
             res.json(response)

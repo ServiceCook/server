@@ -11,7 +11,6 @@ router.post("/reviews", isAuthenticated, (req, res, next) => {
 
   const name = req.payload.name;
   const picture = req.payload.picture; 
-  console.log(name + picture, "my id in review");
   
 
   const newReview = {

@@ -107,15 +107,13 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
           With our platform, you can find a lot of amazing food service you like. <br /> <br />
           
           If you have any questions or need assistance, our support team is here to help. <br /> <br />
-          Feel free to reach out to us at [support email or contact information]. <br /> <br />
+          Feel free to reach out to us at <p><strong>chefontheway003@gmail.com</strong></p>. <br /> <br />
           
           Once again, welcome! We hope you have a fantastic experience using our platform. <br /> <br /> <br /> <br />
           
           <p>Best regards,</p>
           <h4>Chef On The Way</h4>
           <h4>Pierre Docquin and Solideo Zendrato</h4>
-          <p><strong>chefontheway003@gmail.com</strong></p>
-          <img src="https://imgur.com/AVjelAu" style="width: 300px"/>
         </p>
       `;
 
@@ -155,6 +153,38 @@ router.get("/profile", isAuthenticated, (req, res, next) => {
   res.status(200).json({_id, email, name, address, picture})
   console.log(req.payload, "this data coming form line 95");
 })
+
+// PUT /auth/profile - Updates the user's profile
+router.put("/profile", isAuthenticated, (req, res, next) => {
+  const { name, address, picture } = req.body;
+  const userId = req.payload._id; // Get the user's ID from the authenticated payload
+
+  // Find the user by ID in the database and update their profile information
+  User.findByIdAndUpdate(
+    userId,
+    { name, address, picture },
+    { new: true }
+  )
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        // If the user is not found, send an error response
+        res.status(404).json({ message: "User not found." });
+        return;
+      }
+
+      // Deconstruct the updated user object to omit the password
+      const { _id, email, name, address, picture } = updatedUser;
+
+      // Create a new object that doesn't expose the password
+      const user = { _id, email, name, address, picture };
+
+      // Send a JSON response containing the updated user object
+      res.status(200).json({ user: user });
+    })
+    .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
+});
+
+
 
 
 // POST  /auth/login - Verifies email and password and returns a JWT
