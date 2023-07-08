@@ -11,6 +11,7 @@ To run in your computer, follow these steps:
 - install dependencies: npm install
 - install nodemailer : npm install nodemailer (since we use nodemailer to transmit the message)
 - install cloudinary: npm install cloudinary multer multer-storage-cloudinary (to allow you to user the cloudinary)
+- npm run dev
 - create .env file with the following environment variables
   - ORIGIN: the origin location (example, ORIGIN=5005),
   - TOKEN_SECRET: used to sign auth token (example, TOKEN_SECRET = mysecrett0ken)
