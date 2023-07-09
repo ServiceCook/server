@@ -3,8 +3,49 @@ const mongoose = require("mongoose");
 const Reservation = require("../models/Reservation.model");
 const Service = require("../models/Service.model");
 const User = require("../models/User.model");
-
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+
+router.get("/profile", isAuthenticated, (req, res, next) => {
+  const {_id, email, name, address, picture} = req.payload;
+  res.status(200).json({_id, email, name, address, picture})
+  console.log(req.payload, "this data coming form line 95");
+})
+
+
+router.get("/profile/:id", isAuthenticated, (req, res, next) => {
+  const userId = req.params.id
+  console.log(userId)
+
+  User.findById(userId)
+    .select("-password") // Exclude the password field from the query result 
+    .then(user => res.json(user))
+    .catch(e => {
+      console.log("failed to get the user id", e);
+      res.status(500).json({
+        message: "failed to get the user id",
+        error: e
+      })
+    })
+  
+})
+
+// PUT /auth/profile - Updates the user's profile
+router.put("/profile/:id", isAuthenticated, (req, res, next) => {
+  const { name, address, picture } = req.body;
+  const userId = req.payload._id; 
+
+  User.findByIdAndUpdate(
+    userId,
+    { name, address, picture },
+    { new: true }
+  )
+    .select("-password")
+    .then((updatedUser) => {
+      res.json(updatedUser)
+    })
+    .catch((err) => next(err));
+});
+
 
 router.get('/myService', isAuthenticated, (req, res, next) => {
     const userId = req.payload._id
@@ -25,11 +66,11 @@ router.get('/myService', isAuthenticated, (req, res, next) => {
 
   router.get("/reservations", isAuthenticated, (req, res, next) => {
     const userId = req.payload;
-  
-    console.log(userId);
+    
+    console.log(userId, "tell me this one");
   
     Reservation.find({ user: userId })
-      .populate({ path: "service", select: "serviceName" }) // Populate the service information
+      .populate("service") // Populate the service information
       .populate({path: "user", select: "-password"})
       .then(reservations => {
         console.log(reservations);
@@ -45,4 +86,4 @@ router.get('/myService', isAuthenticated, (req, res, next) => {
   });
 
 
-  module.exports = router;
+module.exports = router;

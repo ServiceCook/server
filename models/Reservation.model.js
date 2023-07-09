@@ -6,7 +6,6 @@ const reservationModel = new Schema(
         user:{
             type: Schema.Types.ObjectId,
             ref: "User",
-            // required: true
         },
         service:{
             type: Schema.Types.ObjectId,
@@ -15,7 +14,6 @@ const reservationModel = new Schema(
         },
         fullName: {
             type: String,
-            //required: true
         },
         totalPerson: {
             type: Number,

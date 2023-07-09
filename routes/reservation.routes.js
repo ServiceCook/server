@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const Reservation = require("../models/Reservation.model");
 const Service = require("../models/Service.model");
-const User = require("../models/User.model");
+// const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // Transporter code
@@ -19,6 +19,8 @@ let transporter = nodemailer.createTransport({
 router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) => {
   const { serviceId } = req.params;
 
+  console.log(serviceId);
+  
   const {fullName, totalPerson, pricePerPerson, date, hour} = req.body;
 
   if(!mongoose.Types.ObjectId.isValid(serviceId)) {
@@ -26,15 +28,10 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
     return;
   }
 
-  console.log(req.payload.email, "this is the email of the user who reserved the service")
-
   Service.findById(serviceId)
-    .populate({
-      path: 'owner',
-      select: 'email'
-    })
+    .populate({path: "owner", select: "-password"})
     .then(service => {
-        console.log(service.owner.email, "this is the email of service's owner")
+        // console.log(service.owner.email, "this is the email of service's owner")
       if(!service) {
         res.status(400).json({message: 'service not found'})
         return;
@@ -42,7 +39,6 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
 
 
       const newReservation = new Reservation({
-
         service: serviceId,
         user: req.payload,
         fullName: fullName,
@@ -56,13 +52,13 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
       newReservation.save()
         .then(savedReservation => {
 
-          console.log(req.payload.address, "tell me this address") ;
+          // console.log(req.payload.address, "tell me this address") ;
           res.status(201).json(savedReservation)
           const ownerEmail = service.owner.email;
 
           const html = `
             <h2>Below are the details of your new reservation:</h2>
-            <p><strong>Name:</strong> ${savedReservation.fullName}</p>
+            <p><strong>Order by:</strong> ${req.payload.name}</p>
             <p><strong>User Email:</strong> <strong>${req.payload.email}</strong> </p>
             <p><strong>Total Persons:</strong> ${savedReservation.totalPerson}</p>
             <p><strong>Address:</strong> ${req.payload.address}</p>
@@ -70,6 +66,7 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
             <p><strong>Hour:</strong> ${savedReservation.hour}</p>
             <p><strong>Price Per Person:</strong> ${savedReservation.pricePerPerson} €</p>
             <p><strong>Total Price:</strong> ${savedReservation.totalPrice} €</p>
+            <p><strong>Service by:</strong> ${service.owner.name} €</p>
             <br />
             <p><strong>Noted:</strong> If you have some detailed requirements, please email this owner at ${ownerEmail}!</p>
             <br /> <br /> <br />
@@ -79,9 +76,6 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
             <p><strong>chefontheway003@gmail.com</strong></p>
           `;
 
-
-          console.log(savedReservation.totalPerson, "total person");
-          console.log(savedReservation.totalPrice, "total price")
           // // Send email to the owner
           const mailOptions = {
             from: "chefontheway003@gmail.com",
@@ -91,7 +85,6 @@ router.post("/services/:serviceId/reserve", isAuthenticated, (req, res, next) =>
           }
 
           console.log(html, "html");
-          console.log(req.payload.email, "email user")
 
           transporter.sendMail(mailOptions, (error, info) => {
             if(error) {
@@ -225,7 +218,7 @@ router.put("/reservations/:reservationId", isAuthenticated, (req, res, next) => 
 
       const html = `
         <h2>Your reservation has been updated:</h2>
-        <p><strong>Name:</strong> ${updatedReservation.user.name}</p>
+        <p><strong>Order by:</strong> ${updatedReservation.user.name}</p>
         <p><strong>User Email:</strong> <strong>${userEmail}</strong> </p>
         <p><strong>Total Persons:</strong> ${updatedReservation.totalPerson}</p>
         <p><strong>Address:</strong> ${updatedReservation.user.address}</p>

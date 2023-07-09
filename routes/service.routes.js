@@ -2,7 +2,6 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const Reservation = require("../models/Reservation.model");
 const Service = require("../models/Service.model");
-const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
 const fileUploader = require("../config/cloudinary.config");
 
@@ -18,8 +17,6 @@ router.post("/upload", fileUploader.single("picture"), (req, res, next) => {
      
 router.post("/services", isAuthenticated, (req, res, next) => {
   const {picture, speciality, place, description, pricePerPerson, availability } = req.body;
-
-  console.log("give me something about this", req.payload )
 
   const newService = {
     picture: picture,

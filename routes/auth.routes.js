@@ -147,45 +147,6 @@ router.post("/signup", fileUploader.single("picture"),(req, res, next) => {
     .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
 });
 
-//profile routes
-router.get("/profile", isAuthenticated, (req, res, next) => {
-  const {_id, email, name, address, picture} = req.payload;
-  res.status(200).json({_id, email, name, address, picture})
-  console.log(req.payload, "this data coming form line 95");
-})
-
-// PUT /auth/profile - Updates the user's profile
-router.put("/profile", isAuthenticated, (req, res, next) => {
-  const { name, address, picture } = req.body;
-  const userId = req.payload._id; // Get the user's ID from the authenticated payload
-
-  // Find the user by ID in the database and update their profile information
-  User.findByIdAndUpdate(
-    userId,
-    { name, address, picture },
-    { new: true }
-  )
-    .then((updatedUser) => {
-      if (!updatedUser) {
-        // If the user is not found, send an error response
-        res.status(404).json({ message: "User not found." });
-        return;
-      }
-
-      // Deconstruct the updated user object to omit the password
-      const { _id, email, name, address, picture } = updatedUser;
-
-      // Create a new object that doesn't expose the password
-      const user = { _id, email, name, address, picture };
-
-      // Send a JSON response containing the updated user object
-      res.status(200).json({ user: user });
-    })
-    .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
-});
-
-
-
 
 // POST  /auth/login - Verifies email and password and returns a JWT
 router.post("/login", (req, res, next) => {
